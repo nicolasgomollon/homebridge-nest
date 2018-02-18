@@ -2,8 +2,6 @@
 
 Nest plugin for [HomeBridge](https://github.com/nfarina/homebridge)
 
-This repository contains the Nest plugin for homebridge that was previously bundled in the main `homebridge` repository.
-
 # Disclaimer
 
 This is a lightly modified fork for my personal use, all credit goes to [KraigM](https://github.com/KraigM/homebridge-nest).
