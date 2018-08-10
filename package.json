@@ -1,7 +1,7 @@
 {
   "name": "homebridge-nest-schmittx",
   "description": "Nest plugin for homebridge",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "scripts": {
     "test": "eslint index.js lib/*"
   },

@@ -69,13 +69,13 @@ NestPlatform.prototype.accessories = function (callback) {
 
     var loadDevices = function (DeviceType) {
       var list = data.devices && data.devices[DeviceType.deviceGroup];
-      for (var deviceId in list) {
-        if (NestPlatform.prototype.hasOwnProperty.call(list, deviceId)) {
-          var device = list[deviceId];
+      for (var deviceID in list) {
+        if (NestPlatform.prototype.hasOwnProperty.call(list, deviceID)) {
+          var device = list[deviceID];
           var structureID = device.structure_id;
           var structure = data.structures[structureID];
-          var accessory = new DeviceType(this.conn, this.log, device, structure);
-          that.accessoryLookup[deviceId] = accessory;
+          var accessory = new DeviceType(this.conn, this.log, device, structure, this);
+          this.accessoryLookup[deviceID] = accessory;
           foundAccessories.push(accessory);
         }
       }
@@ -90,7 +90,7 @@ NestPlatform.prototype.accessories = function (callback) {
 
   var updateAccessories = function (data, accList) {
     accList.map(function (acc) {
-      var device = data.devices[acc.deviceGroup][acc.deviceId];
+      var device = data.devices[acc.deviceGroup][acc.deviceID];
       var structureID = device.structure_id;
       var structure = data.structures[structureID];
       acc.updateData(device, structure);
@@ -123,6 +123,40 @@ NestPlatform.prototype.accessories = function (callback) {
     });
 };
 
+NestPlatform.prototype.getModel = function (device, defaultModel) {
+  const deviceID = device.device_id;
+  var model = defaultModel;
+  if (this.config.accessory_info) {
+    var accessoryInfo = this.config.accessory_info;
+    for (var index = 0; index < accessoryInfo.length; index++) {
+      var deviceInfo = accessoryInfo[index];
+      if (deviceInfo.device_id === deviceID) {
+        if (deviceInfo.model) {
+          model = deviceInfo.model.toString();
+        }
+      }
+    }
+  }
+  return model;
+};
+
+NestPlatform.prototype.getSerialNumber = function (device) {
+  const deviceID = device.device_id;
+  var serialNumber = deviceID;
+  if (this.config.accessory_info) {
+    var accessoryInfo = this.config.accessory_info;
+    for (var index = 0; index < accessoryInfo.length; index++) {
+      var deviceInfo = accessoryInfo[index];
+      if (deviceInfo.device_id === deviceID) {
+        if (deviceInfo.serial_number) {
+          serialNumber = deviceInfo.serial_number.toString();
+        }
+      }
+    }
+  }
+  return serialNumber;
+};
+
 module.exports = function (homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
@@ -137,10 +171,10 @@ module.exports = function (homebridge) {
   };
 
   /* eslint-disable global-require */
-  DeviceAccessory = require('./lib/nest-device-accessory.js')(exportedTypes);
-  ThermostatAccessory = require('./lib/nest-thermostat-accessory.js')(exportedTypes);
-  ProtectAccessory = require('./lib/nest-protect-accessory.js')(exportedTypes);
   CamAccessory = require('./lib/nest-cam-accessory.js')(exportedTypes);
+  DeviceAccessory = require('./lib/nest-device-accessory.js')(exportedTypes);
+  ProtectAccessory = require('./lib/nest-protect-accessory.js')(exportedTypes);
+  ThermostatAccessory = require('./lib/nest-thermostat-accessory.js')(exportedTypes);
   /* eslint-enable global-require */
 
   homebridge.registerPlatform('homebridge-nest', 'Nest', NestPlatform);
