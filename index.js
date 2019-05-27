@@ -15,6 +15,29 @@ var ProtectAccessory;
 var ThermostatAccessory;
 /* eslint-enable no-unused-vars */
 
+module.exports = function (homebridge) {
+  Service = homebridge.hap.Service;
+  Characteristic = homebridge.hap.Characteristic;
+  Accessory = homebridge.hap.Accessory;
+  uuid = homebridge.hap.uuid;
+
+  var exportedTypes = {
+    Accessory: Accessory,
+    Service: Service,
+    Characteristic: Characteristic,
+    uuid: uuid
+  };
+
+  /* eslint-disable global-require */
+  CamAccessory = require('./lib/nest-cam-accessory.js')(exportedTypes);
+  DeviceAccessory = require('./lib/nest-device-accessory.js')(exportedTypes);
+  ProtectAccessory = require('./lib/nest-protect-accessory.js')(exportedTypes);
+  ThermostatAccessory = require('./lib/nest-thermostat-accessory.js')(exportedTypes);
+  /* eslint-enable global-require */
+
+  homebridge.registerPlatform('homebridge-nest', 'Nest', NestPlatform);
+};
+
 function NestPlatform(log, config) {
   this.config = config;
   this.log = log;
@@ -155,27 +178,4 @@ NestPlatform.prototype.getSerialNumber = function (device) {
     }
   }
   return serialNumber;
-};
-
-module.exports = function (homebridge) {
-  Service = homebridge.hap.Service;
-  Characteristic = homebridge.hap.Characteristic;
-  Accessory = homebridge.hap.Accessory;
-  uuid = homebridge.hap.uuid;
-
-  var exportedTypes = {
-    Accessory: Accessory,
-    Service: Service,
-    Characteristic: Characteristic,
-    uuid: uuid
-  };
-
-  /* eslint-disable global-require */
-  CamAccessory = require('./lib/nest-cam-accessory.js')(exportedTypes);
-  DeviceAccessory = require('./lib/nest-device-accessory.js')(exportedTypes);
-  ProtectAccessory = require('./lib/nest-protect-accessory.js')(exportedTypes);
-  ThermostatAccessory = require('./lib/nest-thermostat-accessory.js')(exportedTypes);
-  /* eslint-enable global-require */
-
-  homebridge.registerPlatform('homebridge-nest', 'Nest', NestPlatform);
 };
